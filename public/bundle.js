@@ -86,21 +86,17 @@
 /************************************************************************/
 /******/ ({
 
-/***/ "./src/main.js":
+/***/ "./src/data.js":
 /*!*********************!*\
-  !*** ./src/main.js ***!
+  !*** ./src/data.js ***!
   \*********************/
-/*! no exports provided */
+/*! exports provided: filtersData, pointData */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _src_make_filter__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../src/make-filter */ "./src/make-filter.js");
-/* harmony import */ var _src_make_points__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../src/make-points */ "./src/make-points.js");
-
-
-const pointsContainer = document.querySelector(`.trip-points`);
-const filtersContainer = document.querySelector(`.trip-filter`);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "filtersData", function() { return filtersData; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "pointData", function() { return pointData; });
 const filtersData = [{
   "caption": `Everything`,
   "checked": true
@@ -111,38 +107,111 @@ const filtersData = [{
   "caption": `Past`,
   "checked": false
 }];
-
-const getRandom = (min, max) => {
-  return Math.floor(Math.random() * (max - min)) + min;
+const pointData = {
+  type: [{
+    name: `Taxi`,
+    icon: `🚕`,
+    text: `Taxi to `
+  }, {
+    name: `Bus`,
+    icon: `🚌`,
+    text: `Bus to `
+  }, {
+    name: `Train`,
+    icon: `🚂`,
+    text: `Train to `
+  }, {
+    name: `Ship`,
+    icon: `🛳️`,
+    text: `Ship to `
+  }, {
+    name: `Transport`,
+    icon: `🚊`,
+    text: `Transport to `
+  }, {
+    name: `Drive`,
+    icon: `🚗`,
+    text: `Drive to `
+  }, {
+    name: `Flight`,
+    icon: `✈`,
+    text: `Flight to`
+  }, {
+    name: `Check-in`,
+    icon: `🏨`,
+    text: `Check into a `
+  }, {
+    name: `Sightseeing`,
+    icon: `🏛️`,
+    text: `Sightseeing `
+  }, {
+    name: `Restaurant`,
+    icon: `🍴`,
+    text: `Check into a`
+  }],
+  city: [`Amsterdam`, `Geneva`, `Chamonix`],
+  offers: [`Add luggage`, `Switch to comfort class`, `Add meal`, `Choose seats`],
+  description: [`Lorem ipsum dolor sit amet, consectetur adipiscing elit.`, `Cras aliquet varius magna, non porta ligula feugiat eget.`, `Fusce tristique felis at fermentum pharetra. Aliquam id orci ut lectus varius viverra.`, `Nullam nunc ex, convallis sed finibus eget, sollicitudin eget ante.`, `Phasellus eros mauris, condimentum sed nibh vitae, sodales efficitur ipsum.`, `Sed blandit, eros vel aliquam faucibus, purus ex euismod diam, eu luctus nunc ante ut dui.`, `Sed sed nisi sed augue convallis suscipit in sed felis. Aliquam erat volutpat.`, `Nunc fermentum tortor ac porta dapibus.`, `In rutrum ac purus sit amet tempus`]
 };
 
-const clearElement = element => {
-  while (element.firstChild) {
-    element.removeChild(element.firstChild);
-  }
-};
+/***/ }),
+
+/***/ "./src/main.js":
+/*!*********************!*\
+  !*** ./src/main.js ***!
+  \*********************/
+/*! exports provided: generatePoints */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "generatePoints", function() { return generatePoints; });
+/* harmony import */ var _src_make_filter__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../src/make-filter */ "./src/make-filter.js");
+/* harmony import */ var _src_make_points__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../src/make-points */ "./src/make-points.js");
+/* harmony import */ var _data__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./data */ "./src/data.js");
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./utils */ "./src/utils.js");
+
+
+
+
+
+const pointsContainer = document.querySelector(`.trip-points`);
+const filtersContainer = document.querySelector(`.trip-filter`);
 
 const handler = () => {
   filtersContainer.removeEventListener(`click"`, handler);
-  clearElement(pointsContainer);
-  renderPoints(getRandom(1, 8));
+  Object(_utils__WEBPACK_IMPORTED_MODULE_3__["clearElement"])(pointsContainer);
+  renderPoints(Object(_utils__WEBPACK_IMPORTED_MODULE_3__["getRandom"])(1, 8));
 };
 
-const renderPoints = () => {
-  pointsContainer.insertAdjacentHTML(`beforeend`, Object(_src_make_points__WEBPACK_IMPORTED_MODULE_1__["default"])());
+const renderPoints = data => {
+  pointsContainer.insertAdjacentHTML(`beforeend`, Object(_src_make_points__WEBPACK_IMPORTED_MODULE_1__["default"])(data));
 };
 
 const renderFilters = () => {
-  for (const it of filtersData) {
+  for (const it of _data__WEBPACK_IMPORTED_MODULE_2__["filtersData"]) {
     filtersContainer.insertAdjacentHTML(`beforeend`, Object(_src_make_filter__WEBPACK_IMPORTED_MODULE_0__["default"])(it.caption, it.checked));
   }
+};
+
+const generatePoints = data => {
+  const array = {
+    type: data.type[Object(_utils__WEBPACK_IMPORTED_MODULE_3__["getRandom"])(0, 9)],
+    city: data.city[Object(_utils__WEBPACK_IMPORTED_MODULE_3__["getRandom"])(0, 2)],
+    photo: `http://picsum.photos/300/150?r=${Math.random()}`,
+    description: data.description[Object(_utils__WEBPACK_IMPORTED_MODULE_3__["getRandom"])(0, 9)],
+    offers: data.offers[Object(_utils__WEBPACK_IMPORTED_MODULE_3__["getRandom"])(0, 3)],
+    date: Date.now() + 1 + Math.floor(Math.random() * 7) * 24 * 60 * 60 * 1000,
+    price: Object(_utils__WEBPACK_IMPORTED_MODULE_3__["getRandom"])(1, 10) * 100
+  };
+  return array;
 }; // start script
 
+Object(_utils__WEBPACK_IMPORTED_MODULE_3__["clearElement"])(filtersContainer); //clearElement(pointsContainer);
 
-clearElement(filtersContainer);
-clearElement(pointsContainer);
+const points = generatePoints(_data__WEBPACK_IMPORTED_MODULE_2__["pointData"]);
 renderFilters();
-renderPoints(1);
+renderPoints(points);
 filtersContainer.addEventListener(`click`, handler);
 
 /***/ }),
@@ -173,78 +242,58 @@ __webpack_require__.r(__webpack_exports__);
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 // make-points.js
-/* harmony default export */ __webpack_exports__["default"] = (() => `<section class="trip-day">
+const makeElements = data => {
+  let acc = ``;
+  const element = `<article class="trip-point">
+          <i class="trip-icon">${data.type.icon}</i>
+          <h3 class="trip-point__title">${data.type.text}${data.city}</h3>
+          <p class="trip-point__schedule">
+            <span class="trip-point__timetable">10:00&nbsp;&mdash; 11:00</span>
+            <span class="trip-point__duration">1h 30m</span>
+          </p>
+          <p class="trip-point__price">&euro;&nbsp;${data.price}</p>
+          <ul class="trip-point__offers">
+             ${`<li>
+              <button class="trip-point__offer">${data.offers}</button>
+            </li>`}
+          </ul>
+        </article>`;
+  acc = acc + element;
+  return acc;
+};
+
+/* harmony default export */ __webpack_exports__["default"] = (data => `<section class="trip-day">
       <article class="trip-day__info">
         <span class="trip-day__caption">Day</span>
         <p class="trip-day__number">1</p>
         <h2 class="trip-day__title">Mar 18</h2>
       </article>
-
       <div class="trip-day__items">
-        <article class="trip-point">
-          <i class="trip-icon">🚕</i>
-          <h3 class="trip-point__title">Taxi to Airport</h3>
-          <p class="trip-point__schedule">
-            <span class="trip-point__timetable">10:00&nbsp;&mdash; 11:00</span>
-            <span class="trip-point__duration">1h 30m</span>
-          </p>
-          <p class="trip-point__price">&euro;&nbsp;20</p>
-          <ul class="trip-point__offers">
-            <li>
-              <button class="trip-point__offer">Order UBER +&euro;&nbsp;20</button>
-            </li>
-            <li>
-              <button class="trip-point__offer">Upgrade to business +&euro;&nbsp;20</button>
-            </li>
-          </ul>
-        </article>
-        <article class="trip-point">
-          <i class="trip-icon">✈️</i>
-          <h3 class="trip-point__title">Flight to Geneva</h3>
-          <p class="trip-point__schedule">
-            <span class="trip-point__timetable">10:00&nbsp;&mdash; 11:00</span>
-            <span class="trip-point__duration">1h 30m</span>
-          </p>
-          <p class="trip-point__price">&euro;&nbsp;20</p>
-          <ul class="trip-point__offers">
-            <li>
-              <button class="trip-point__offer">Upgrade to business +&euro;&nbsp;20</button>
-            </li>
-            <li>
-              <button class="trip-point__offer">Select meal +&euro;&nbsp;20</button>
-            </li>
-          </ul>
-        </article>
-        <article class="trip-point">
-          <i class="trip-icon">🚗</i>
-          <h3 class="trip-point__title">Drive to Chamonix</h3>
-          <p class="trip-point__schedule">
-            <span class="trip-point__timetable">10:00&nbsp;&mdash; 11:00</span>
-            <span class="trip-point__duration">1h 30m</span>
-          </p>
-          <p class="trip-point__price">&euro;&nbsp;20</p>
-          <ul class="trip-point__offers">
-            <li>
-                <button class="trip-point__offer">Rent a car +&euro;&nbsp;200</button>
-              </li>
-          </ul>
-        </article>
-        <article class="trip-point">
-          <i class="trip-icon">🏨</i>
-          <h3 class="trip-point__title">Check into a hotel</h3>
-          <p class="trip-point__schedule">
-            <span class="trip-point__timetable">10:00&nbsp;&mdash; 11:00</span>
-            <span class="trip-point__duration">1h 30m</span>
-          </p>
-          <p class="trip-point__price">&euro;&nbsp;20</p>
-          <ul class="trip-point__offers">
-            <li>
-              <button class="trip-point__offer">Add breakfast +&euro;&nbsp;20</button>
-            </li>
-          </ul>
-        </article>
+    ${makeElements(data)}
       </div>
     </section>`);
+
+/***/ }),
+
+/***/ "./src/utils.js":
+/*!**********************!*\
+  !*** ./src/utils.js ***!
+  \**********************/
+/*! exports provided: getRandom, clearElement */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getRandom", function() { return getRandom; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "clearElement", function() { return clearElement; });
+const getRandom = (min, max) => {
+  return Math.floor(Math.random() * (max - min)) + min;
+};
+const clearElement = element => {
+  while (element.firstChild) {
+    element.removeChild(element.firstChild);
+  }
+};
 
 /***/ })
 
