@@ -1,41 +1,20 @@
 import makeFilter from '../src/make-filter';
 import makePoints from '../src/make-points';
+import {filtersData} from "./data";
+import {getRandom, clearElement} from "./utils";
+import {pointData} from "./data";
 
 const pointsContainer = document.querySelector(`.trip-points`);
 const filtersContainer = document.querySelector(`.trip-filter`);
-const filtersData = [
-  {
-    "caption": `Everything`,
-    "checked": true
-  },
-  {
-    "caption": `Future`,
-    "checked": false
-  },
-  {
-    "caption": `Past`,
-    "checked": false
-  },
-];
-
-const getRandom = (min, max) => {
-  return Math.floor(Math.random() * (max - min)) + min;
-};
-
-const clearElement = (element) => {
-  while (element.firstChild) {
-    element.removeChild(element.firstChild);
-  }
-};
-
 const handler = () => {
   filtersContainer.removeEventListener(`click"`, handler);
   clearElement(pointsContainer);
   renderPoints(getRandom(1, 8));
 };
 
-const renderPoints = () => {
-  pointsContainer.insertAdjacentHTML(`beforeend`, makePoints());
+
+const renderPoints = (data) => {
+  pointsContainer.insertAdjacentHTML(`beforeend`, makePoints(data));
 };
 
 const renderFilters = () => {
@@ -44,10 +23,27 @@ const renderFilters = () => {
   }
 };
 
+export const generatePoints = (data) => {
+
+  const array = {
+    type: data.type[getRandom(0, 9)],
+    city: data.city[getRandom(0, 2)],
+    photo: `http://picsum.photos/300/150?r=${Math.random()}`,
+    description: data.description[getRandom(0, 9)],
+    offers: data.offers[getRandom(0, 3)],
+    date: Date.now() + 1 + Math.floor(Math.random() * 7) * 24 * 60 * 60 * 1000,
+    price: getRandom(1, 10) * 100,
+  };
+
+  return array;
+};
+
 
 // start script
 clearElement(filtersContainer);
 clearElement(pointsContainer);
+const points = generatePoints(pointData);
 renderFilters();
-renderPoints(1);
+
+renderPoints(points);
 filtersContainer.addEventListener(`click`, handler);
