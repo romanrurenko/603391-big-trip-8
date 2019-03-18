@@ -1,3 +1,5 @@
+import {getRandom} from "./utils";
+
 export const filtersData = [
   {
     "caption": `Everything`,
@@ -12,6 +14,19 @@ export const filtersData = [
     "checked": false
   },
 ];
+
+export const generatePoint = (data) => {
+  const array = {
+    type: data.type[getRandom(0, 9)],
+    city: data.city[getRandom(0, 2)],
+    photo: `http://picsum.photos/300/150?r=${Math.random()}`,
+    description: data.description[getRandom(0, 9)],
+    offers: [data.offers[getRandom(0, 3)], data.offers[getRandom(0, 3)]],
+    date: Date.now() + 1 + Math.floor(Math.random() * 7) * 24 * 60 * 60 * 1000,
+    price: getRandom(1, 10) * 100,
+  };
+  return array;
+};
 
 export const pointData = {
   type: [

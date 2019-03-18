@@ -1,49 +1,45 @@
-import makeFilter from '../src/make-filter';
-import makePoints from '../src/make-points';
-import {filtersData} from "./data";
-import {getRandom, clearElement} from "./utils";
-import {pointData} from "./data";
+import {clearElement} from "./utils";
+import {filtersData, pointData, generatePoint} from "./data";
+import {Event} from "./classes/event";
+import {EventEdit} from "./classes/event-edit";
+import {Filter} from "./classes/filter";
 
-const pointsContainer = document.querySelector(`.trip-points`);
+
+const eventsContainer = document.querySelector(`.trip-day__items`);
 const filtersContainer = document.querySelector(`.trip-filter`);
-const handler = () => {
-  filtersContainer.removeEventListener(`click"`, handler);
-  clearElement(pointsContainer);
-  renderPoints(getRandom(1, 8));
-};
 
+clearElement(filtersContainer);
+clearElement(eventsContainer);
 
-const renderPoints = (data) => {
-  pointsContainer.insertAdjacentHTML(`beforeend`, makePoints(data));
-};
+const eventComponents = [];
+const editEventComponents = [];
+const filtersComponents = [];
 
-const renderFilters = () => {
-  for (const it of filtersData) {
-    filtersContainer.insertAdjacentHTML(`beforeend`, makeFilter(it.caption, it.checked));
-  }
-};
+for (let i = 0; i < 3; i++) {
+  filtersComponents[i] = new Filter(filtersData[i]);
 
-export const generatePoints = (data) => {
+  filtersContainer.appendChild(filtersComponents[i].render());
+}
 
-  const array = {
-    type: data.type[getRandom(0, 9)],
-    city: data.city[getRandom(0, 2)],
-    photo: `http://picsum.photos/300/150?r=${Math.random()}`,
-    description: data.description[getRandom(0, 9)],
-    offers: data.offers[getRandom(0, 3)],
-    date: Date.now() + 1 + Math.floor(Math.random() * 7) * 24 * 60 * 60 * 1000,
-    price: getRandom(1, 10) * 100,
+for (let i = 0; i < 4; i++) {
+  const point = generatePoint(pointData);
+  eventComponents[i] = new Event(point);
+  editEventComponents[i] = new EventEdit(point);
+
+  eventsContainer.appendChild(eventComponents[i].render());
+
+  eventComponents[i].onEdit = () => {
+    editEventComponents[i].render();
+    eventsContainer.replaceChild(editEventComponents[i].element, eventComponents[i].element);
+    eventComponents[i].unrender();
   };
 
-  return array;
-};
+  editEventComponents[i].onSubmit = () => {
+    eventComponents[i].render();
+    eventsContainer.replaceChild(eventComponents[i].element, editEventComponents[i].element);
+    editEventComponents[i].unrender();
+  };
+
+}
 
 
-// start script
-clearElement(filtersContainer);
-clearElement(pointsContainer);
-const points = generatePoints(pointData);
-renderFilters();
-
-renderPoints(points);
-filtersContainer.addEventListener(`click`, handler);
