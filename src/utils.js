@@ -9,3 +9,9 @@ export const clearElement = (element) => {
   }
 };
 
+
+export const createContainer = (template) => {
+  const newElement = document.createElement(`div`);
+  newElement.innerHTML = template;
+  return newElement.firstChild;
+};
