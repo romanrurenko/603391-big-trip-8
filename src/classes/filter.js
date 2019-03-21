@@ -1,17 +1,14 @@
-import {createContainer} from "../utils";
+import {Component} from "./component";
 
-export class Filter {
+export class Filter extends Component {
   constructor(data) {
+    super();
     this._caption = data.caption;
     this._checked = data.checked;
   }
 
   _onEditButtonClick() {
     typeof this._onEdit === `function` && this._onEdit();
-  }
-
-  get element() {
-    return this._element;
   }
 
   set onEdit(fn) {
@@ -26,25 +23,13 @@ export class Filter {
   }
 
   bind() {
-     this._element.querySelector(`.filter-${this._caption.toLowerCase()}`).addEventListener(`click`,
+    this._element.querySelector(`.filter-${this._caption.toLowerCase()}`).addEventListener(`click`,
         this._onEditButtonClick.bind(this));
-  }
-
-  render() {
-    this._element = createContainer(this.template);
-    this.bind();
-    return this._element;
   }
 
   unbind() {
     this._element.querySelector(`.filter-${this._caption.toLowerCase()}`)
       .addEventListener(`click`, this._onEditButtonClick.bind(this));
   }
-
-  unrender() {
-    this.unbind();
-    this._element = null;
-  }
-
 
 }

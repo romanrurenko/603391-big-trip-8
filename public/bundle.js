@@ -86,6 +86,58 @@
 /************************************************************************/
 /******/ ({
 
+/***/ "./src/classes/component.js":
+/*!**********************************!*\
+  !*** ./src/classes/component.js ***!
+  \**********************************/
+/*! exports provided: Component */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Component", function() { return Component; });
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../utils */ "./src/utils.js");
+
+class Component {
+  constructor() {
+    if (new.target === Component) {
+      throw new Error(`Can't instantiate BaseComponent, only concrete one.`);
+    }
+
+    this._element = null;
+    this._state = {};
+  }
+
+  get element() {
+    return this._element;
+  }
+
+  get template() {
+    throw new Error(`You have to define template.`);
+  }
+
+  render() {
+    this._element = Object(_utils__WEBPACK_IMPORTED_MODULE_0__["createElement"])(this.template);
+    this.bind();
+    return this._element;
+  }
+
+  bind() {}
+
+  unbind() {}
+
+  unrender() {
+    this.unbind();
+
+    this._element.remove();
+
+    this._element = null;
+  }
+
+}
+
+/***/ }),
+
 /***/ "./src/classes/event-edit.js":
 /*!***********************************!*\
   !*** ./src/classes/event-edit.js ***!
@@ -96,10 +148,11 @@
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "EventEdit", function() { return EventEdit; });
-/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../utils */ "./src/utils.js");
+/* harmony import */ var _component__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./component */ "./src/classes/component.js");
 
-class EventEdit {
+class EventEdit extends _component__WEBPACK_IMPORTED_MODULE_0__["Component"] {
   constructor(data) {
+    super();
     this._type = data.type;
     this._city = data.city;
     this._photo = data.photo;
@@ -118,10 +171,6 @@ class EventEdit {
 
   set onSubmit(fn) {
     this._onSubmit = fn;
-  }
-
-  get element() {
-    return this._element;
   }
 
   get template() {
@@ -241,17 +290,6 @@ class EventEdit {
 `.trim();
   }
 
-  render() {
-    this._element = Object(_utils__WEBPACK_IMPORTED_MODULE_0__["createContainer"])(this.template);
-    this.bind();
-    return this._element;
-  }
-
-  unrender() {
-    this.unbind();
-    this._element = null;
-  }
-
   bind() {
     this._element.querySelector(`.point__button--save`).addEventListener(`submit`, this._onSubmitButtonClick.bind(this));
   }
@@ -274,10 +312,11 @@ class EventEdit {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Event", function() { return Event; });
-/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../utils */ "./src/utils.js");
+/* harmony import */ var _component__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./component */ "./src/classes/component.js");
 
-class Event {
+class Event extends _component__WEBPACK_IMPORTED_MODULE_0__["Component"] {
   constructor(data) {
+    super();
     this._type = data.type;
     this._city = data.city;
     this._photo = data.photo;
@@ -293,10 +332,6 @@ class Event {
 
   _onEditButtonClick() {
     typeof this._onEdit === `function` && this._onEdit();
-  }
-
-  get element() {
-    return this._element;
   }
 
   set onEdit(fn) {
@@ -326,18 +361,7 @@ class Event {
     this._element.querySelector(`.trip-icon`).addEventListener(`click`, this._onEditButtonClick.bind(this));
   }
 
-  render() {
-    this._element = Object(_utils__WEBPACK_IMPORTED_MODULE_0__["createContainer"])(this.template);
-    this.bind();
-    return this._element;
-  }
-
   unbind() {// Удаление обработчиков
-  }
-
-  unrender() {
-    this.unbind();
-    this._element = null;
   }
 
 }
@@ -354,20 +378,17 @@ class Event {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Filter", function() { return Filter; });
-/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../utils */ "./src/utils.js");
+/* harmony import */ var _component__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./component */ "./src/classes/component.js");
 
-class Filter {
+class Filter extends _component__WEBPACK_IMPORTED_MODULE_0__["Component"] {
   constructor(data) {
+    super();
     this._caption = data.caption;
     this._checked = data.checked;
   }
 
   _onEditButtonClick() {
     typeof this._onEdit === `function` && this._onEdit();
-  }
-
-  get element() {
-    return this._element;
   }
 
   set onEdit(fn) {
@@ -385,19 +406,8 @@ class Filter {
     this._element.querySelector(`.filter-${this._caption.toLowerCase()}`).addEventListener(`click`, this._onEditButtonClick.bind(this));
   }
 
-  render() {
-    this._element = Object(_utils__WEBPACK_IMPORTED_MODULE_0__["createContainer"])(this.template);
-    this.bind();
-    return this._element;
-  }
-
   unbind() {
     this._element.querySelector(`.filter-${this._caption.toLowerCase()}`).addEventListener(`click`, this._onEditButtonClick.bind(this));
-  }
-
-  unrender() {
-    this.unbind();
-    this._element = null;
   }
 
 }
@@ -546,14 +556,14 @@ for (let i = 0; i < 4; i++) {
 /*!**********************!*\
   !*** ./src/utils.js ***!
   \**********************/
-/*! exports provided: getRandom, clearElement, createContainer */
+/*! exports provided: getRandom, clearElement, createElement */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getRandom", function() { return getRandom; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "clearElement", function() { return clearElement; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "createContainer", function() { return createContainer; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "createElement", function() { return createElement; });
 const getRandom = (min, max) => {
   return Math.floor(Math.random() * (max - min)) + min;
 };
@@ -562,7 +572,7 @@ const clearElement = element => {
     element.removeChild(element.firstChild);
   }
 };
-const createContainer = template => {
+const createElement = template => {
   const newElement = document.createElement(`div`);
   newElement.innerHTML = template;
   return newElement.firstChild;

@@ -1,7 +1,8 @@
-import {createContainer} from "../utils";
+import {Component} from "./component";
 
-export class Event {
+export class Event extends Component {
   constructor(data) {
+    super();
     this._type = data.type;
     this._city = data.city;
     this._photo = data.photo;
@@ -18,10 +19,6 @@ export class Event {
 
   _onEditButtonClick() {
     typeof this._onEdit === `function` && this._onEdit();
-  }
-
-  get element() {
-    return this._element;
   }
 
   set onEdit(fn) {
@@ -54,19 +51,9 @@ export class Event {
       .addEventListener(`click`, this._onEditButtonClick.bind(this));
   }
 
-  render() {
-    this._element = createContainer(this.template);
-    this.bind();
-    return this._element;
-  }
 
   unbind() {
     // Удаление обработчиков
-  }
-
-  unrender() {
-    this.unbind();
-    this._element = null;
   }
 
 
