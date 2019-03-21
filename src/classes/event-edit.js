@@ -1,7 +1,8 @@
-import {createContainer} from "../utils";
+import {Component} from "./component";
 
-export class EventEdit {
+export class EventEdit extends Component {
   constructor(data) {
+    super();
     this._type = data.type;
     this._city = data.city;
     this._photo = data.photo;
@@ -21,10 +22,6 @@ export class EventEdit {
 
   set onSubmit(fn) {
     this._onSubmit = fn;
-  }
-
-  get element() {
-    return this._element;
   }
 
   get template() {
@@ -144,16 +141,6 @@ export class EventEdit {
 `.trim();
   }
 
-  render() {
-    this._element = createContainer(this.template);
-    this.bind();
-    return this._element;
-  }
-
-  unrender() {
-    this.unbind();
-    this._element = null;
-  }
 
   bind() {
     this._element.querySelector(`.point__button--save`)
