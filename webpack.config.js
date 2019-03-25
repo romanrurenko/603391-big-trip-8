@@ -1,5 +1,6 @@
 const path = require(`path`);
 const HtmlWebpackPlugin = require(`html-webpack-plugin`);
+const MomentLocalesPlugin = require(`moment-locales-webpack-plugin`);
 
 
 module.exports = {
@@ -16,11 +17,13 @@ module.exports = {
       use: `babel-loader` // Лоадер, который будет применен
     }]
   },
-  // plugins: [ // Расширяем функциональность плагинами
-  //   new HtmlWebpackPlugin({ // Создаем инстанс плагина
-  //     template: `./src/index.html`// …передав в него необходимые ему параметры
-  //   })
-  // ],
+  plugins: [ // Расширяем функциональность плагинами
+    // new HtmlWebpackPlugin({ // Создаем инстанс плагина
+    //   template: `./src/index1.html`// …передав в него необходимые ему параметры
+    // }),
+    new MomentLocalesPlugin({
+      localesToKeep: [`es-us`],
+    })],
   devServer: {
     contentBase: path.join(__dirname, `public`), // Где искать сборку
     publicPath: `http://localhost:8080/`, // Веб адрес сборки

@@ -1,4 +1,5 @@
 import {Component} from "./component";
+import flatpickr from "flatpickr";
 
 export class EventEdit extends Component {
   constructor(data) {
@@ -8,16 +9,58 @@ export class EventEdit extends Component {
     this._photo = data.photo;
     this._description = data.description;
     this._date = data.date;
-    this._price = data.price;
+    this._price = data.cost;
     this._offers = data.offers;
     this._element = null;
-
+    this._onSubmitButtonClick = this._onSubmitButtonClick.bind(this);
     this._onSubmit = null;
+    this._state.isFavorite = false;
+
+
+    this._onChangeFavorite = this._onChangeFavorite.bind(this);
+    this._onDelete = this._onDelete.bind(this);
+  }
+
+  _processForm(formData) {
+    const entry = {
+      type: ``,
+      city: ``,
+      photo: new Set(),
+      description: ``,
+      date: ``,
+      price: 0,
+      offers: [],
+      isFavorite: false,
+    };
+
+    const eventEditMapper = EventEdit.createMapper(entry);
+
+    for (const pair of formData.entries()) {
+      const [property, value] = pair;
+      eventEditMapper[property] && eventEditMapper[property](value);
+    }
+    return entry;
   }
 
   _onSubmitButtonClick(evt) {
     evt.preventDefault();
-    typeof this._onSubmit === `function` && this._onSubmit();
+    const formData = new FormData(this._element.querySelector(`.event__form`));
+    const newData = this._processForm(formData);
+    typeof this._onSubmit === `function` && this._onSubmit(newData);
+    this.update(newData);
+  }
+
+  _onChangeFavorite() {
+    this._state.isFavorite = !this._state.isFavorite;
+  }
+
+  _onDelete() {
+    this.unbind();
+    this.unrender();
+  }
+
+  _partialUpdate() {
+    this._element.innerHTML = this.template;
   }
 
   set onSubmit(fn) {
@@ -26,7 +69,7 @@ export class EventEdit extends Component {
 
   get template() {
     return `<article class="point">
-  <form action="" method="get">
+  <form action=""  class="EVENT__form" method="get">
     <header class="point__header">
       <label class="point__date">
         choose day
@@ -76,22 +119,22 @@ export class EventEdit extends Component {
 
       <label class="point__time">
         choose time
-        <input class="point__input" type="text" value="00:00 — 00:00" name="time" placeholder="00:00 — 00:00">
+        <input class="point__input" id="point__time" type="text" value="00:00 — 00:00" name="time" placeholder="00:00 — 00:00">
       </label>
 
       <label class="point__price">
         write price
         <span class="point__price-currency">€</span>
-        <input class="point__input" type="text" value="160" name="price">
+        <input class="point__input" type="text" value="${this._price}" name="price">
       </label>
 
       <div class="point__buttons">
         <button class="point__button point__button--save" type="submit">Save</button>
-        <button class="point__button" type="reset">Delete</button>
+        <button class="point__button delete" type="reset">Delete</button>
       </div>
 
       <div class="paint__favorite-wrap">
-        <input type="checkbox" class="point__favorite-input visually-hidden" id="favorite" name="favorite">
+        <input type="checkbox" class="point__favorite-input visually-hidden" id="favorite" name="favorite" ${this._state.isFavorite ? `checked` : ``}>
         <label class="point__favorite" for="favorite">favorite</label>
       </div>
     </header>
@@ -101,25 +144,14 @@ export class EventEdit extends Component {
         <h3 class="point__details-title">offers</h3>
 
         <div class="point__offers-wrap">
-          <input class="point__offers-input visually-hidden" type="checkbox" id="add-luggage" name="offer" value="add-luggage">
-          <label for="add-luggage" class="point__offers-label">
-            <span class="point__offer-service">Add luggage</span> + €<span class="point__offer-price">30</span>
-          </label>
-
-          <input class="point__offers-input visually-hidden" type="checkbox" id="switch-to-comfort-class" name="offer" value="switch-to-comfort-class">
-          <label for="switch-to-comfort-class" class="point__offers-label">
-            <span class="point__offer-service">Switch to comfort class</span> + €<span class="point__offer-price">100</span>
-          </label>
-
-          <input class="point__offers-input visually-hidden" type="checkbox" id="add-meal" name="offer" value="add-meal">
-          <label for="add-meal" class="point__offers-label">
-            <span class="point__offer-service">Add meal </span> + €<span class="point__offer-price">15</span>
-          </label>
-
-          <input class="point__offers-input visually-hidden" type="checkbox" id="choose-seats" name="offer" value="choose-seats">
-          <label for="choose-seats" class="point__offers-label">
-            <span class="point__offer-service">Choose seats</span> + €<span class="point__offer-price">5</span>
-          </label>
+        
+        
+        ${(Array.from(this._offers).map((offer) => (`
+          <input class="point__offers-input visually-hidden" type="checkbox" id="${offer.styleElement}" name="offer" value="${offer.styleElement}" ${offer.checkedElement ? `checked` : ``}>
+          <label for="${offer.styleElement}" class="point__offers-label">
+            <span class="point__offer-service">${offer.name}</span> +€<span class="point__offer-price">${offer.cost}</span>
+          </label>`.trim()
+  ))).join(``)}
         </div>
 
       </section>
@@ -141,16 +173,46 @@ export class EventEdit extends Component {
 `.trim();
   }
 
-
   bind() {
     this._element.querySelector(`.point__button--save`)
-      .addEventListener(`submit`, this._onSubmitButtonClick.bind(this));
+      .addEventListener(`submit`, this._onSubmitButtonClick);
+    this._element.querySelector(`.point__buttons .delete`)
+        .addEventListener(`click`, this._onDelete);
+    this._element.querySelector(`.point__favorite`)
+     .addEventListener(`click`, this._onChangeFavorite);
+
+    flatpickr(`#point__time`, {altInput: true, altFormat: `j F`, dateFormat: `j F`});
+
   }
 
   unbind() {
     this._element.querySelector(`.point__button--save`)
-      .removeEventListener(`submit`, this._onSubmitButtonClick.bind(this));
+      .removeEventListener(`submit`, this._onSubmitButtonClick);
+    this._element.querySelector(`.point__buttons .delete`)
+        .removeEventListener(`click`, this._onDelete);
+    this._element.querySelector(`.point__favorite`)
+        .removeEventListener(`click`, this._onChangeFavorite);
+  }
+
+  update(data) {
+    this._title = data.title;
+    this._tags = data.tags;
+    this._color = data.color;
+    this._repeatingDays = data.repeatingDays;
+    this._dueDate = data.dueDate;
+  }
+
+  static createMapper(target) {
+    return {
+
+      photo: (value) => target.photo.add(value),
+      description: (value) => target.description = value,
+      price: (value) => target.price = value,
+      type: (value) => target.type = value,
+      city: (value) => target.city = value,
+      date: (value) => target.date = value,
+      isFavorite: (value) => target.isFavorite = value,
+      offers: (value) => target.offers[value],
+    };
   }
 }
-
-

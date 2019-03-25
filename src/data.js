@@ -15,18 +15,6 @@ export const filtersData = [
   },
 ];
 
-export const generatePoint = (data) => {
-  const array = {
-    type: data.type[getRandom(0, 9)],
-    city: data.city[getRandom(0, 2)],
-    photo: `http://picsum.photos/300/150?r=${Math.random()}`,
-    description: data.description[getRandom(0, 9)],
-    offers: [data.offers[getRandom(0, 3)], data.offers[getRandom(0, 3)]],
-    date: Date.now() + 1 + Math.floor(Math.random() * 7) * 24 * 60 * 60 * 1000,
-    price: getRandom(1, 10) * 100,
-  };
-  return array;
-};
 
 export const pointData = {
   type: [
@@ -40,9 +28,20 @@ export const pointData = {
     {name: `Check-in`, icon: `🏨`, text: `Check into a `},
     {name: `Sightseeing`, icon: `🏛️`, text: `Sightseeing `},
     {name: `Restaurant`, icon: `🍴`, text: `Check into a`},
-  ],
-  city: [`Amsterdam`, `Geneva`, `Chamonix`],
-  offers: [`Add luggage`, `Switch to comfort class`, `Add meal`, `Choose seats`],
+  ][getRandom(0, 9)],
+  city: [`Amsterdam`, `Geneva`, `Chamonix`][getRandom(0, 2)],
+  photo: new Set(
+      `http://picsum.photos/300/150?r=${Math.random()}`,
+      `http://picsum.photos/300/150?r=${Math.random()}`
+  ),
+  offers: [[
+    {name: `Add luggage`, cost: getRandom(1, 10) * 10, checkedElement: false, styleElement: `add-luggage`},
+    {name: `Switch to comfort class`, cost: getRandom(1, 10) * 10, checkedElement: false, styleElement: `switch-to-comfort-class`},
+    {name: `Add meal`, cost: getRandom(1, 10) * 10, checkedElement: false, styleElement: `add-meal`},
+    {name: `Choose seats`, cost: getRandom(1, 10) * 10, checkedElement: false, styleElement: `choose-seats`},
+  ][getRandom(0, 3)]],
+  date: Date.now() + 1 + Math.floor(Math.random() * 7) * 24 * 60 * 60 * 1000,
+  cost: getRandom(1, 10) * 100,
   description: [`Lorem ipsum dolor sit amet, consectetur adipiscing elit.`,
     `Cras aliquet varius magna, non porta ligula feugiat eget.`,
     `Fusce tristique felis at fermentum pharetra. Aliquam id orci ut lectus varius viverra.`,
@@ -51,5 +50,5 @@ export const pointData = {
     `Sed blandit, eros vel aliquam faucibus, purus ex euismod diam, eu luctus nunc ante ut dui.`,
     `Sed sed nisi sed augue convallis suscipit in sed felis. Aliquam erat volutpat.`,
     `Nunc fermentum tortor ac porta dapibus.`,
-    `In rutrum ac purus sit amet tempus`],
+    `In rutrum ac purus sit amet tempus`][getRandom(0, 9)],
 };
