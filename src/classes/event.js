@@ -8,14 +8,18 @@ export class Event extends Component {
     this._photo = data.photo;
     this._description = data.description;
     this._date = data.date;
-    this._price = data.price;
+    this._price = data.cost;
     this._offers = data.offers;
     this._element = null;
-
+    this._onEditButtonClick = this._onEditButtonClick.bind(this);
     this._state = {
-      isEdit: false
+      isFavorite: false
     };
   }
+
+  // _isRepeated() {
+  //   return Object.values(this._repeatingDays).some(it => it === true);
+  // }
 
   _onEditButtonClick() {
     typeof this._onEdit === `function` && this._onEdit();
@@ -36,14 +40,14 @@ export class Event extends Component {
           <p class="trip-point__price">&euro;&nbsp;${this._price}</p>
           <ul class="trip-point__offers">
                        
-      ${(Array.from(this._offers).map((tag) => (`<li>
-              <button class="trip-point__offer">${tag}</button>
+      ${(Array.from(this._offers).map((offer) => (`<li>
+              <button class="trip-point__offer">${offer.name}&nbsp;+&euro;${offer.cost}</button>
             </li>`.trim()
   )).join(``))}
       
           </ul>
         </article>`.trim();
-  }
+  };
 
 
   bind() {
@@ -53,10 +57,16 @@ export class Event extends Component {
 
 
   unbind() {
-    // Удаление обработчиков
+    this._element.querySelector(`.trip-icon`)
+      .removeEventListener(`click`, this._onEditButtonClick);
   }
 
-
+  update(data) {
+    this._title = data.title;
+    this._tags = data.tags;
+    this._color = data.color;
+    this._repeatingDays = data.repeatingDays;
+  }
 }
 
 
