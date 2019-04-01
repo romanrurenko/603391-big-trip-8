@@ -8,21 +8,21 @@ import {transportType} from "./data";
 
 
 const getEventsStats = () => {
-  const eventsStats= {
-    'labels':[],
-    'data':[],
+  const eventsStats = {
+    'labels': [],
+    'data': [],
   };
-for (const it of initialEvents) {
-  eventsStats.data.push(getTotalPrice(it.offers,it.price));
-  eventsStats.labels.push(`${travelToData[it.type].text}${it.city} ${travelToData[it.type].icon}`);
-}
+  for (const it of initialEvents) {
+    eventsStats.data.push(getTotalPrice(it.offers, it.price));
+    eventsStats.labels.push(`${travelToData[it.type].text}${it.city} ${travelToData[it.type].icon}`);
+  }
   return eventsStats;
 };
 
 const getTransportStats = () => {
-  const transportStats= {
-    'labels':[],
-    'data':[],
+  const transportStats = {
+    'labels': [],
+    'data': [],
   };
 
   const array = [];
@@ -31,19 +31,21 @@ const getTransportStats = () => {
   }
 
   for (const it of transportType) {
-    const sum = array.filter((elem) => {return elem === it}).length;
+    const sum = array.filter((elem) => {
+      return elem === it;
+    }).length;
     transportStats.data.push(sum);
     transportStats.labels.push(`${travelToData[it].name} ${travelToData[it].icon}`);
-  };
+  }
 
- return transportStats;
+  return transportStats;
 };
 
 
 export const showChart = () => {
 
-  const eventsStats = Object.assign({},getEventsStats());
-  const transportStats = Object.assign({},getTransportStats());
+  const eventsStats = Object.assign({}, getEventsStats());
+  const transportStats = Object.assign({}, getTransportStats());
   const moneyCtx = document.querySelector(`.statistic__money`);
   const transportCtx = document.querySelector(`.statistic__transport`);
   const timeSpendCtx = document.querySelector(`.statistic__time-spend`);
@@ -72,8 +74,8 @@ export const showChart = () => {
             size: 13
           },
           color: `#000000`,
-          anchor: 'end',
-          align: 'start',
+          anchor: `end`,
+          align: `start`,
           formatter: (val) => `€ ${val}`
         }
       },
@@ -137,8 +139,8 @@ export const showChart = () => {
             size: 13
           },
           color: `#000000`,
-          anchor: 'end',
-          align: 'start',
+          anchor: `end`,
+          align: `start`,
           formatter: (val) => `${val}x`
         }
       },

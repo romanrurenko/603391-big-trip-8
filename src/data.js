@@ -1,9 +1,9 @@
 import {getRandom} from "./utils";
 
 export const filtersData = [
-  {"caption": `Everything`,"checked": true},
-  {"caption": `Future`,"checked": false},
-  {"caption": `Past`,"checked": false},
+  {"caption": `Everything`, "checked": true},
+  {"caption": `Future`, "checked": false},
+  {"caption": `Past`, "checked": false},
 ];
 
 export const travelType = [`taxi`, `bus`, `train`, `ship`, `transport`, `drive`, `flight`, `check-in`,

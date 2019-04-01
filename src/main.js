@@ -13,8 +13,7 @@ clearElement(filtersContainer);
 clearElement(eventsContainer);
 
 export const moment = require(`moment`);
-export const initialEvents =  new Array(7).fill(7).map(pointData);
-
+export const initialEvents = new Array(7).fill(7).map(pointData);
 
 
 const filtersComponents = [];
@@ -76,7 +75,6 @@ const renderTasks = (events) => {
       editEventComponent.onDelete = () => {
         editEventComponent.unrender();
         events[i].deleted = true;
-        console.log(events);
       };
       eventsContainer.appendChild(eventComponent.render());
     }
@@ -90,10 +88,6 @@ const renderTasks = (events) => {
 };
 
 
-
-
 renderTasks(initialEvents, eventsContainer);
-
-
 
 
