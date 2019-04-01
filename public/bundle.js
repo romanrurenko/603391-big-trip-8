@@ -7363,36 +7363,44 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _component__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./component */ "./src/classes/component.js");
 /* harmony import */ var flatpickr__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! flatpickr */ "./node_modules/flatpickr/dist/flatpickr.js");
 /* harmony import */ var flatpickr__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(flatpickr__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _data__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../data */ "./src/data.js");
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../utils */ "./src/utils.js");
+
+
 
 
 class EventEdit extends _component__WEBPACK_IMPORTED_MODULE_0__["Component"] {
   constructor(data) {
     super();
     this._type = data.type;
+    this._day = data.day;
     this._city = data.city;
     this._photo = data.photo;
     this._description = data.description;
     this._date = data.date;
-    this._price = data.cost;
+    this._price = data.price;
     this._offers = data.offers;
     this._element = null;
     this._onSubmitButtonClick = this._onSubmitButtonClick.bind(this);
+    this._onTravelClick = this._onTravelClick.bind(this);
     this._onSubmit = null;
     this._state.isFavorite = false;
+    this._totalPrice = Object(_utils__WEBPACK_IMPORTED_MODULE_3__["getTotalPrice"])(data.offers, data.price);
+    this._deleted = data.deleted;
     this._onChangeFavorite = this._onChangeFavorite.bind(this);
-    this._onDelete = this._onDelete.bind(this);
+    this._onDelete = null;
   }
 
   _processForm(formData) {
     const entry = {
+      day: new Date(),
       type: ``,
       city: ``,
-      photo: new Set(),
-      description: ``,
       date: ``,
       price: 0,
-      offers: [],
-      isFavorite: false
+      offers: new Set(),
+      isFavorite: ``,
+      totalPrice: 0
     };
     const eventEditMapper = EventEdit.createMapper(entry);
 
@@ -7414,13 +7422,26 @@ class EventEdit extends _component__WEBPACK_IMPORTED_MODULE_0__["Component"] {
     this.update(newData);
   }
 
-  _onChangeFavorite() {
-    this._state.isFavorite = !this._state.isFavorite;
+  _onTravelClick(evt) {
+    const newTravelType = evt.target.value;
+
+    if (newTravelType && _data__WEBPACK_IMPORTED_MODULE_2__["travelType"].indexOf(newTravelType)) {
+      const travelIconContainer = this._element.querySelector(`form > header > div.travel-way > label`);
+
+      const travelTypeContainer = this._element.querySelector(`.point__destination-label`);
+
+      this._type = newTravelType;
+      travelIconContainer.innerHTML = _data__WEBPACK_IMPORTED_MODULE_2__["travelToData"][newTravelType].icon;
+      travelTypeContainer.innerHTML = _data__WEBPACK_IMPORTED_MODULE_2__["travelToData"][newTravelType].text;
+    }
+
+    const menu = this._element.querySelector(`input.travel-way__toggle`);
+
+    menu.checked = false;
   }
 
-  _onDelete() {
-    this.unbind();
-    this.unrender();
+  _onChangeFavorite() {
+    this._state.isFavorite = !this._state.isFavorite;
   }
 
   _partialUpdate() {
@@ -7431,59 +7452,55 @@ class EventEdit extends _component__WEBPACK_IMPORTED_MODULE_0__["Component"] {
     this._onSubmit = fn;
   }
 
+  set onDelete(fn) {
+    this._onDelete = fn;
+  }
+
   get template() {
     return `<article class="point">
-  <form action=""  class="EVENT__form" method="get">
+  <form class="event__form" method="get">
     <header class="point__header">
       <label class="point__date">
         choose day
-        <input class="point__input" type="text" placeholder="MAR 18" name="day">
+        <input class="point__input" type="text" placeholder="MAR 18" name="day" value="${this._day}">
       </label>
 
       <div class="travel-way">
-        <label class="travel-way__label" for="travel-way__toggle">${this._type.icon}</label>
+        <label class="travel-way__label" for="travel-way__toggle">${_data__WEBPACK_IMPORTED_MODULE_2__["travelToData"][this._type].icon}</label>
 
         <input type="checkbox" class="travel-way__toggle visually-hidden" id="travel-way__toggle">
 
         <div class="travel-way__select">
           <div class="travel-way__select-group">
-            <input class="travel-way__select-input visually-hidden" type="radio" id="travel-way-taxi" name="travel-way" value="taxi">
-            <label class="travel-way__select-label" for="travel-way-taxi">🚕 taxi</label>
-
-            <input class="travel-way__select-input visually-hidden" type="radio" id="travel-way-bus" name="travel-way" value="bus">
-            <label class="travel-way__select-label" for="travel-way-bus">🚌 bus</label>
-
-            <input class="travel-way__select-input visually-hidden" type="radio" id="travel-way-train" name="travel-way" value="train">
-            <label class="travel-way__select-label" for="travel-way-train">🚂 train</label>
-
-            <input class="travel-way__select-input visually-hidden" type="radio" id="travel-way-flight" name="travel-way" value="train" checked>
-            <label class="travel-way__select-label" for="travel-way-flight">✈️ flight</label>
-          </div>
-
-          <div class="travel-way__select-group">
-            <input class="travel-way__select-input visually-hidden" type="radio" id="travel-way-check-in" name="travel-way" value="check-in">
-            <label class="travel-way__select-label" for="travel-way-check-in">🏨 check-in</label>
-
-            <input class="travel-way__select-input visually-hidden" type="radio" id="travel-way-sightseeing" name="travel-way" value="sight-seeing">
-            <label class="travel-way__select-label" for="travel-way-sightseeing">🏛 sightseeing</label>
+          
+                  ${Array.from(_data__WEBPACK_IMPORTED_MODULE_2__["travelType"]).map(it => `
+            <input class="travel-way__select-input visually-hidden" type="radio"
+             id="travel-way-${it}" name="travel-way" value="${it}"  ${this._type === it ? `checked` : ``}>
+            <label class="travel-way__select-label" for="travel-way-${it}">
+            ${_data__WEBPACK_IMPORTED_MODULE_2__["travelToData"][it].icon} ${it}</label>`.trim()).join(``)}
+          
+                   
           </div>
         </div>
       </div>
 
       <div class="point__destination-wrap">
-        <label class="point__destination-label" for="destination">${this._type.text}</label>
+        <label class="point__destination-label" for="destination">${_data__WEBPACK_IMPORTED_MODULE_2__["travelToData"][this._type].text}</label>
         <input class="point__destination-input" list="destination-select" id="destination" value="${this._city}" name="destination">
         <datalist id="destination-select">
-          <option value="airport"></option>
-          <option value="Geneva"></option>
-          <option value="Chamonix"></option>
-          <option value="hotel"></option>
+        
+
+ 
+         ${Array.from(_data__WEBPACK_IMPORTED_MODULE_2__["cities"]).map(it => `<option value="${it}"></option>`.trim()).join(``)}
+          
+          
         </datalist>
       </div>
-
+      
+      
       <label class="point__time">
         choose time
-        <input class="point__input" id="point__time" type="text" value="00:00 — 00:00" name="time" placeholder="00:00 — 00:00">
+        <input class="point__input " type="text" value="${this._date}" name="time" placeholder="00:00 — 00:00">
       </label>
 
       <label class="point__price">
@@ -7510,26 +7527,28 @@ class EventEdit extends _component__WEBPACK_IMPORTED_MODULE_0__["Component"] {
         <div class="point__offers-wrap">
         
         
-        ${Array.from(this._offers).map(offer => `
-          <input class="point__offers-input visually-hidden" type="checkbox" id="${offer.styleElement}" name="offer" value="${offer.styleElement}" ${offer.checkedElement ? `checked` : ``}>
-          <label for="${offer.styleElement}" class="point__offers-label">
-            <span class="point__offer-service">${offer.name}</span> +€<span class="point__offer-price">${offer.cost}</span>
+        ${Array.from(_data__WEBPACK_IMPORTED_MODULE_2__["offersTypes"]).map(offer => `
+          <input class="point__offers-input visually-hidden" type="checkbox" id="${offer}" 
+          name="offer" value="${offer}" ${this._offers.has(offer) ? `checked` : ``}>
+          <label for="${offer}" class="point__offers-label">
+            <span class="point__offer-service">${_data__WEBPACK_IMPORTED_MODULE_2__["offersData"][offer].name}</span> +€<span class="point__offer-price">${_data__WEBPACK_IMPORTED_MODULE_2__["offersData"][offer].cost}</span>
           </label>`.trim()).join(``)}
         </div>
 
       </section>
       <section class="point__destination">
         <h3 class="point__details-title">Destination</h3>
-        <p class="point__destination-text">Geneva is a city in Switzerland that lies at the southern tip of expansive Lac Léman (Lake Geneva). Surrounded by the Alps and Jura mountains, the city has views of dramatic Mont Blanc.</p>
+        <p class="point__destination-text">${this._description}</p>
         <div class="point__destination-images">
-          <img src="http://picsum.photos/330/140?r=123" alt="picture from place" class="point__destination-image">
-          <img src="http://picsum.photos/300/200?r=1234" alt="picture from place" class="point__destination-image">
-          <img src="http://picsum.photos/300/100?r=12345" alt="picture from place" class="point__destination-image">
-          <img src="http://picsum.photos/200/300?r=123456" alt="picture from place" class="point__destination-image">
-          <img src="http://picsum.photos/100/300?r=1234567" alt="picture from place" class="point__destination-image">
+
+
+        ${Array.from(this._photo).map(it => `
+          <img src="${it}" alt="picture from place" class="point__destination-image">
+  `.trim()).join(``)}
+
         </div>
       </section>
-      <input type="hidden" class="point__total-price" name="total-price" value="">
+      <input type="" class="point__total-price" name="total-price" value="${this._totalPrice}">
     </section>
   </form>
 </article>
@@ -7537,13 +7556,17 @@ class EventEdit extends _component__WEBPACK_IMPORTED_MODULE_0__["Component"] {
   }
 
   bind() {
-    this._element.querySelector(`.point__button--save`).addEventListener(`submit`, this._onSubmitButtonClick);
+    this._element.querySelector(`.travel-way__select`).addEventListener(`change`, this._onTravelClick);
+
+    this._element.querySelector(`.event__form`).addEventListener(`submit`, this._onSubmitButtonClick);
 
     this._element.querySelector(`.point__buttons .delete`).addEventListener(`click`, this._onDelete);
 
     this._element.querySelector(`.point__favorite`).addEventListener(`click`, this._onChangeFavorite);
 
-    flatpickr__WEBPACK_IMPORTED_MODULE_1___default()(`#point__time`, {
+    flatpickr__WEBPACK_IMPORTED_MODULE_1___default()(`.point__time .point__date`, {
+      mode: `range`,
+      rangeSeparator: ` - `,
       altInput: true,
       altFormat: `j F`,
       dateFormat: `j F`
@@ -7551,7 +7574,9 @@ class EventEdit extends _component__WEBPACK_IMPORTED_MODULE_0__["Component"] {
   }
 
   unbind() {
-    this._element.querySelector(`.point__button--save`).removeEventListener(`submit`, this._onSubmitButtonClick);
+    this._element.querySelector(`.travel-way__select`).removeEventListener(`click`, this._onTravelClick);
+
+    this._element.querySelector(`.event__form`).removeEventListener(`submit`, this._onSubmitButtonClick);
 
     this._element.querySelector(`.point__buttons .delete`).removeEventListener(`click`, this._onDelete);
 
@@ -7559,23 +7584,26 @@ class EventEdit extends _component__WEBPACK_IMPORTED_MODULE_0__["Component"] {
   }
 
   update(data) {
-    this._title = data.title;
-    this._tags = data.tags;
-    this._color = data.color;
-    this._repeatingDays = data.repeatingDays;
-    this._dueDate = data.dueDate;
+    this._type = data.type;
+    this._day = data.day;
+    this._city = data.city;
+    this._date = data.date;
+    this._price = data.price;
+    this._totalPrice = Object(_utils__WEBPACK_IMPORTED_MODULE_3__["getTotalPrice"])(data.offers, data.price);
+    this._offers = data.offers;
+    this._state.isFavorite = data.isFavorite;
   }
 
   static createMapper(target) {
     return {
-      photo: value => target.photo.add(value),
-      description: value => target.description = value,
-      price: value => target.price = value,
-      type: value => target.type = value,
-      city: value => target.city = value,
-      date: value => target.date = value,
-      isFavorite: value => target.isFavorite = value,
-      offers: value => target.offers[value]
+      "price": value => target.price = value,
+      "destination": value => target.city = value,
+      "time": value => target.date = value,
+      "day": value => target.day = value,
+      "favorite": value => target.isFavorite = value === `on` ? true : false,
+      "offer": value => target.offers.add(value),
+      "travel-way": value => target.type = value,
+      "total-price": value => target.totalPrice = value
     };
   }
 
@@ -7594,6 +7622,8 @@ class EventEdit extends _component__WEBPACK_IMPORTED_MODULE_0__["Component"] {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Event", function() { return Event; });
 /* harmony import */ var _component__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./component */ "./src/classes/component.js");
+/* harmony import */ var _data__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../data */ "./src/data.js");
+
 
 class Event extends _component__WEBPACK_IMPORTED_MODULE_0__["Component"] {
   constructor(data) {
@@ -7603,17 +7633,14 @@ class Event extends _component__WEBPACK_IMPORTED_MODULE_0__["Component"] {
     this._photo = data.photo;
     this._description = data.description;
     this._date = data.date;
-    this._price = data.cost;
+    this._price = data.price;
     this._offers = data.offers;
     this._element = null;
     this._onEditButtonClick = this._onEditButtonClick.bind(this);
     this._state = {
       isFavorite: false
     };
-  } // _isRepeated() {
-  //   return Object.values(this._repeatingDays).some(it => it === true);
-  // }
-
+  }
 
   _onEditButtonClick() {
     typeof this._onEdit === `function` && this._onEdit();
@@ -7625,25 +7652,24 @@ class Event extends _component__WEBPACK_IMPORTED_MODULE_0__["Component"] {
 
   get template() {
     return `<article class="trip-point">
-          <i class="trip-icon">${this._type.icon}</i>
-          <h3 class="trip-point__title">${this._type.text}${this._city}</h3>
+          <i class="trip-icon">${_data__WEBPACK_IMPORTED_MODULE_1__["travelToData"][this._type].icon}</i>
+          <h3 class="trip-point__title">${_data__WEBPACK_IMPORTED_MODULE_1__["travelToData"][this._type].text} ${this._city}</h3>
           <p class="trip-point__schedule">
-            <span class="trip-point__timetable">10:00&nbsp;&mdash; 11:00</span>
+            <span class="trip-point__timetable">${this._date}</span>
             <span class="trip-point__duration">1h 30m</span>
           </p>
           <p class="trip-point__price">&euro;&nbsp;${this._price}</p>
           <ul class="trip-point__offers">
                        
       ${Array.from(this._offers).map(offer => `<li>
-              <button class="trip-point__offer">${offer.name}&nbsp;+&euro;${offer.cost}</button>
+              <button class="trip-point__offer">${_data__WEBPACK_IMPORTED_MODULE_1__["offersData"][offer].name}&nbsp;+&euro;${_data__WEBPACK_IMPORTED_MODULE_1__["offersData"][offer].cost}</button>
             </li>`.trim()).join(``)}
-      
           </ul>
         </article>`.trim();
   }
 
   bind() {
-    this._element.querySelector(`.trip-icon`).addEventListener(`click`, this._onEditButtonClick.bind(this));
+    this._element.addEventListener(`click`, this._onEditButtonClick.bind(this));
   }
 
   unbind() {
@@ -7651,10 +7677,12 @@ class Event extends _component__WEBPACK_IMPORTED_MODULE_0__["Component"] {
   }
 
   update(data) {
-    this._title = data.title;
-    this._tags = data.tags;
-    this._color = data.color;
-    this._repeatingDays = data.repeatingDays;
+    this._type = data.type;
+    this._city = data.city;
+    this._date = data.date;
+    this._price = data.price;
+    this._offers = data.offers;
+    this._state.isFavorite = data.isFavorite;
   }
 
 }
@@ -7680,27 +7708,29 @@ class Filter extends _component__WEBPACK_IMPORTED_MODULE_0__["Component"] {
     this._checked = data.checked;
   }
 
-  _onEditButtonClick() {
-    typeof this._onEdit === `function` && this._onEdit();
+  _onFilterButtonClick(evt) {
+    this._checked = true;
+    typeof this._onFilter === `function` && this._onFilter(evt);
   }
 
-  set onEdit(fn) {
-    this._onEdit = fn;
+  set onFilter(fn) {
+    this._onFilter = fn;
   }
 
   get template() {
     return `<span><input type="radio" id="filter-${this._caption.toLowerCase()}"
-            name="filter-${this._caption.toLowerCase()}" value="${this._caption.toLowerCase()}"
-            ${this._checked ? ` checked` : ``}><label class="trip-filter__item filter-${this._caption.toLowerCase()}"
+            name="filter" value="${this._caption.toLowerCase()}"
+            ${this._checked ? ` checked` : ``}>
+            <label class="trip-filter__item filter-${this._caption.toLowerCase()}"
             for="filter-${this._caption.toLowerCase()}">${this._caption}</label></span>`.trim();
   }
 
   bind() {
-    this._element.querySelector(`.filter-${this._caption.toLowerCase()}`).addEventListener(`click`, this._onEditButtonClick.bind(this));
+    this._element.addEventListener(`click`, this._onFilterButtonClick.bind(this));
   }
 
   unbind() {
-    this._element.querySelector(`.filter-${this._caption.toLowerCase()}`).addEventListener(`click`, this._onEditButtonClick.bind(this));
+    this._element.addEventListener(`click`, this._onFilterButtonClick.bind(this));
   }
 
 }
@@ -7711,12 +7741,18 @@ class Filter extends _component__WEBPACK_IMPORTED_MODULE_0__["Component"] {
 /*!*********************!*\
   !*** ./src/data.js ***!
   \*********************/
-/*! exports provided: filtersData, pointData */
+/*! exports provided: filtersData, travelType, transportType, travelToData, offersData, offersTypes, cities, pointData */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "filtersData", function() { return filtersData; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "travelType", function() { return travelType; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "transportType", function() { return transportType; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "travelToData", function() { return travelToData; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "offersData", function() { return offersData; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "offersTypes", function() { return offersTypes; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "cities", function() { return cities; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "pointData", function() { return pointData; });
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./utils */ "./src/utils.js");
 
@@ -7730,74 +7766,93 @@ const filtersData = [{
   "caption": `Past`,
   "checked": false
 }];
-const pointData = {
-  type: [{
+const travelType = [`taxi`, `bus`, `train`, `ship`, `transport`, `drive`, `flight`, `check-in`, `sightseeing`, `restaurant`];
+const transportType = [`taxi`, `bus`, `train`, `ship`, `transport`, `drive`, `flight`];
+const travelToData = {
+  "taxi": {
     name: `Taxi`,
     icon: `🚕`,
     text: `Taxi to `
-  }, {
+  },
+  "bus": {
     name: `Bus`,
     icon: `🚌`,
     text: `Bus to `
-  }, {
+  },
+  "train": {
     name: `Train`,
     icon: `🚂`,
     text: `Train to `
-  }, {
+  },
+  "ship": {
     name: `Ship`,
     icon: `🛳️`,
     text: `Ship to `
-  }, {
+  },
+  "transport": {
     name: `Transport`,
     icon: `🚊`,
     text: `Transport to `
-  }, {
+  },
+  "drive": {
     name: `Drive`,
     icon: `🚗`,
     text: `Drive to `
-  }, {
+  },
+  "flight": {
     name: `Flight`,
     icon: `✈`,
     text: `Flight to`
-  }, {
+  },
+  "check-in": {
     name: `Check-in`,
     icon: `🏨`,
     text: `Check into a `
-  }, {
+  },
+  "sightseeing": {
     name: `Sightseeing`,
     icon: `🏛️`,
     text: `Sightseeing `
-  }, {
+  },
+  "restaurant": {
     name: `Restaurant`,
     icon: `🍴`,
     text: `Check into a`
-  }][Object(_utils__WEBPACK_IMPORTED_MODULE_0__["getRandom"])(0, 9)],
-  city: [`Amsterdam`, `Geneva`, `Chamonix`][Object(_utils__WEBPACK_IMPORTED_MODULE_0__["getRandom"])(0, 2)],
-  photo: new Set(`http://picsum.photos/300/150?r=${Math.random()}`, `http://picsum.photos/300/150?r=${Math.random()}`),
-  offers: [[{
+  }
+};
+const offersData = {
+  'add-luggage': {
     name: `Add luggage`,
-    cost: Object(_utils__WEBPACK_IMPORTED_MODULE_0__["getRandom"])(1, 10) * 10,
-    checkedElement: false,
-    styleElement: `add-luggage`
-  }, {
+    cost: 100
+  },
+  'switch-to-comfort-class': {
     name: `Switch to comfort class`,
-    cost: Object(_utils__WEBPACK_IMPORTED_MODULE_0__["getRandom"])(1, 10) * 10,
-    checkedElement: false,
-    styleElement: `switch-to-comfort-class`
-  }, {
+    cost: 20
+  },
+  'add-meal': {
     name: `Add meal`,
-    cost: Object(_utils__WEBPACK_IMPORTED_MODULE_0__["getRandom"])(1, 10) * 10,
-    checkedElement: false,
-    styleElement: `add-meal`
-  }, {
+    cost: 5
+  },
+  'choose-seats': {
     name: `Choose seats`,
-    cost: Object(_utils__WEBPACK_IMPORTED_MODULE_0__["getRandom"])(1, 10) * 10,
-    checkedElement: false,
-    styleElement: `choose-seats`
-  }][Object(_utils__WEBPACK_IMPORTED_MODULE_0__["getRandom"])(0, 3)]],
-  date: Date.now() + 1 + Math.floor(Math.random() * 7) * 24 * 60 * 60 * 1000,
-  cost: Object(_utils__WEBPACK_IMPORTED_MODULE_0__["getRandom"])(1, 10) * 100,
-  description: [`Lorem ipsum dolor sit amet, consectetur adipiscing elit.`, `Cras aliquet varius magna, non porta ligula feugiat eget.`, `Fusce tristique felis at fermentum pharetra. Aliquam id orci ut lectus varius viverra.`, `Nullam nunc ex, convallis sed finibus eget, sollicitudin eget ante.`, `Phasellus eros mauris, condimentum sed nibh vitae, sodales efficitur ipsum.`, `Sed blandit, eros vel aliquam faucibus, purus ex euismod diam, eu luctus nunc ante ut dui.`, `Sed sed nisi sed augue convallis suscipit in sed felis. Aliquam erat volutpat.`, `Nunc fermentum tortor ac porta dapibus.`, `In rutrum ac purus sit amet tempus`][Object(_utils__WEBPACK_IMPORTED_MODULE_0__["getRandom"])(0, 9)]
+    cost: 30
+  }
+};
+const offersTypes = [`add-luggage`, `switch-to-comfort-class`, `add-meal`, `choose-seats`];
+const cities = [`Amsterdam`, `Geneva`, `Chamonix`, `Novosibirsk`];
+const pointData = () => {
+  return {
+    deleted: false,
+    day: new Date(),
+    type: travelType[Object(_utils__WEBPACK_IMPORTED_MODULE_0__["getRandom"])(0, 9)],
+    city: cities[Object(_utils__WEBPACK_IMPORTED_MODULE_0__["getRandom"])(0, 4)],
+    photo: [`http://picsum.photos/100/100?r=${Math.random()}`, `http://picsum.photos/100/100?r=${Object(_utils__WEBPACK_IMPORTED_MODULE_0__["getRandom"])(0, 1000)}`, `http://picsum.photos/100/100?r=${Math.random()}`],
+    offers: new Set([`add-luggage`, `switch-to-comfort-class`]),
+    date: `00:00 - 00:00`,
+    totalPrice: 0,
+    price: Object(_utils__WEBPACK_IMPORTED_MODULE_0__["getRandom"])(1, 10) * 100,
+    description: [`Lorem ipsum dolor sit amet, consectetur adipiscing elit.`, `Cras aliquet varius magna, non porta ligula feugiat eget.`, `Fusce tristique felis at fermentum pharetra. Aliquam id orci ut lectus varius viverra.`, `Nullam nunc ex, convallis sed finibus eget, sollicitudin eget ante.`, `Phasellus eros mauris, condimentum sed nibh vitae, sodales efficitur ipsum.`, `Sed blandit, eros vel aliquam faucibus, purus ex euismod diam, eu luctus nunc ante ut dui.`, `Sed sed nisi sed augue convallis suscipit in sed felis. Aliquam erat volutpat.`, `Nunc fermentum tortor ac porta dapibus.`, `In rutrum ac purus sit amet tempus`][Object(_utils__WEBPACK_IMPORTED_MODULE_0__["getRandom"])(0, 9)]
+  };
 };
 
 /***/ }),
@@ -7806,17 +7861,23 @@ const pointData = {
 /*!*********************!*\
   !*** ./src/main.js ***!
   \*********************/
-/*! exports provided: moment */
+/*! exports provided: filtersContainer, moment, initialEvents */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "filtersContainer", function() { return filtersContainer; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "moment", function() { return moment; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "initialEvents", function() { return initialEvents; });
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./utils */ "./src/utils.js");
 /* harmony import */ var _data__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./data */ "./src/data.js");
 /* harmony import */ var _classes_event__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./classes/event */ "./src/classes/event.js");
 /* harmony import */ var _classes_event_edit__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./classes/event-edit */ "./src/classes/event-edit.js");
 /* harmony import */ var _classes_filter__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./classes/filter */ "./src/classes/filter.js");
+/* harmony import */ var _show_stats__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./show-stats */ "./src/show-stats.js");
+/* harmony import */ var _setSwitcher__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./setSwitcher */ "./src/setSwitcher.js");
+
+
 
 
 
@@ -7824,40 +7885,322 @@ __webpack_require__.r(__webpack_exports__);
 
 const eventsContainer = document.querySelector(`.trip-day__items`);
 const filtersContainer = document.querySelector(`.trip-filter`);
-const moment = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js");
 Object(_utils__WEBPACK_IMPORTED_MODULE_0__["clearElement"])(filtersContainer);
-Object(_utils__WEBPACK_IMPORTED_MODULE_0__["clearElement"])(eventsContainer); // const eventComponents = [];
-// const editEventComponents = [];
-
+Object(_utils__WEBPACK_IMPORTED_MODULE_0__["clearElement"])(eventsContainer);
+const moment = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js");
+const initialEvents = new Array(7).fill(7).map(_data__WEBPACK_IMPORTED_MODULE_1__["pointData"]);
 const filtersComponents = [];
 
-for (let i = 0; i < 3; i++) {
+for (let i = 0; i < _data__WEBPACK_IMPORTED_MODULE_1__["filtersData"].length; i++) {
   filtersComponents[i] = new _classes_filter__WEBPACK_IMPORTED_MODULE_4__["Filter"](_data__WEBPACK_IMPORTED_MODULE_1__["filtersData"][i]);
   filtersContainer.appendChild(filtersComponents[i].render());
+
+  filtersComponents[i].onFilter = evt => {
+    const filterName = evt.target.id;
+    const filteredEvents = sortEvents(initialEvents, filterName);
+    renderTasks(filteredEvents, eventsContainer);
+  };
 }
 
-const eventComponents = new _classes_event__WEBPACK_IMPORTED_MODULE_2__["Event"](_data__WEBPACK_IMPORTED_MODULE_1__["pointData"]);
-const editEventComponents = new _classes_event_edit__WEBPACK_IMPORTED_MODULE_3__["EventEdit"](_data__WEBPACK_IMPORTED_MODULE_1__["pointData"]);
-eventsContainer.appendChild(eventComponents.render());
-
-eventComponents.onEdit = () => {
-  editEventComponents.render();
-  eventsContainer.replaceChild(editEventComponents.element, eventComponents.element);
-  eventComponents.unrender();
+const updateEvent = (events, i, newEvent) => {
+  events[i] = Object.assign({}, events[i], newEvent);
+  return events[i];
 };
 
-editEventComponents.onSubmit = newObject => {
-  event.type = newObject.type;
-  event.price = newObject.price;
-  event.city = newObject.city;
-  event.description = newObject.description;
-  event.date = newObject.date;
-  event.isFavorite = newObject.isFavorite;
-  event.offers = newObject.offers;
-  eventComponents.update(event);
-  eventComponents.render();
-  eventsContainer.replaceChild(eventComponents.element, editEventComponents.element);
-  editEventComponents.unrender();
+const sortEvents = (events, filterName) => {
+  switch (filterName) {
+    case `filter-everything`:
+      return initialEvents;
+
+    case `filter-future`:
+      return initialEvents.filter(it => it.day > Date.now());
+
+    case `filter-past`:
+      return initialEvents.filter(it => it.day < Date.now());
+  }
+
+  return null;
+};
+
+const renderTasks = events => {
+  eventsContainer.innerHTML = ``;
+
+  if (events !== null && !events.deleted) {
+    for (let i = 0; i < events.length; i++) {
+      const event = events[i];
+      const eventComponent = new _classes_event__WEBPACK_IMPORTED_MODULE_2__["Event"](event);
+      const editEventComponent = new _classes_event_edit__WEBPACK_IMPORTED_MODULE_3__["EventEdit"](event);
+
+      eventComponent.onEdit = () => {
+        editEventComponent.render();
+        eventsContainer.replaceChild(editEventComponent.element, eventComponent.element);
+        eventComponent.unrender();
+      };
+
+      editEventComponent.onSubmit = newObject => {
+        const updatedEvent = updateEvent(events, i, newObject);
+        eventComponent.update(updatedEvent);
+        eventComponent.render();
+        eventsContainer.replaceChild(eventComponent.element, editEventComponent.element);
+        editEventComponent.unrender();
+      };
+
+      editEventComponent.onDelete = () => {
+        editEventComponent.unrender();
+        events[i].deleted = true;
+        console.log(events);
+      };
+
+      eventsContainer.appendChild(eventComponent.render());
+    }
+
+    Object(_show_stats__WEBPACK_IMPORTED_MODULE_5__["showChart"])();
+    Object(_setSwitcher__WEBPACK_IMPORTED_MODULE_6__["setSwitcher"])();
+  }
+};
+
+renderTasks(initialEvents, eventsContainer);
+
+/***/ }),
+
+/***/ "./src/setSwitcher.js":
+/*!****************************!*\
+  !*** ./src/setSwitcher.js ***!
+  \****************************/
+/*! exports provided: setSwitcher */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "setSwitcher", function() { return setSwitcher; });
+/* harmony import */ var _main__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./main */ "./src/main.js");
+
+const setSwitcher = () => {
+  const mainContainer = document.querySelector(`.main`);
+  const statsContainer = document.querySelector(`.statistic`);
+  const tableSelector = document.querySelector(`#table-selector`);
+  const menuSelector = document.querySelector(`#stats-selector`);
+
+  const showStats = () => {
+    mainContainer.classList.add('visually-hidden');
+    statsContainer.classList.remove('visually-hidden'); //filtersContainer.classList.add('visually-hidden');
+
+    _main__WEBPACK_IMPORTED_MODULE_0__["filtersContainer"].style = "visibility: hidden;";
+    tableSelector.classList.remove('view-switch__item--active');
+    menuSelector.classList.add('view-switch__item--active');
+  };
+
+  const showTable = () => {
+    mainContainer.classList.remove('visually-hidden');
+    statsContainer.classList.add('visually-hidden');
+    _main__WEBPACK_IMPORTED_MODULE_0__["filtersContainer"].style = "";
+    tableSelector.classList.add('view-switch__item--active');
+    menuSelector.classList.remove('view-switch__item--active');
+  };
+
+  tableSelector.addEventListener('click', showTable);
+  menuSelector.addEventListener('click', showStats);
+};
+
+/***/ }),
+
+/***/ "./src/show-stats.js":
+/*!***************************!*\
+  !*** ./src/show-stats.js ***!
+  \***************************/
+/*! exports provided: showChart */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "showChart", function() { return showChart; });
+!(function webpackMissingModule() { var e = new Error("Cannot find module 'chart.js'"); e.code = 'MODULE_NOT_FOUND'; throw e; }());
+!(function webpackMissingModule() { var e = new Error("Cannot find module 'chartjs-plugin-datalabels'"); e.code = 'MODULE_NOT_FOUND'; throw e; }());
+/* harmony import */ var _main__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./main */ "./src/main.js");
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./utils */ "./src/utils.js");
+/* harmony import */ var _data__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./data */ "./src/data.js");
+
+
+
+
+
+
+
+const getEventsStats = () => {
+  const eventsStats = {
+    'labels': [],
+    'data': []
+  };
+
+  for (const it of _main__WEBPACK_IMPORTED_MODULE_1__["initialEvents"]) {
+    eventsStats.data.push(Object(_utils__WEBPACK_IMPORTED_MODULE_2__["getTotalPrice"])(it.offers, it.price));
+    eventsStats.labels.push(`${_data__WEBPACK_IMPORTED_MODULE_3__["travelToData"][it.type].text}${it.city} ${_data__WEBPACK_IMPORTED_MODULE_3__["travelToData"][it.type].icon}`);
+  }
+
+  return eventsStats;
+};
+
+const getTransportStats = () => {
+  const transportStats = {
+    'labels': [],
+    'data': []
+  };
+  const array = [];
+
+  for (const it of _main__WEBPACK_IMPORTED_MODULE_1__["initialEvents"]) {
+    array.push(it.type);
+  }
+
+  for (const it of _data__WEBPACK_IMPORTED_MODULE_3__["transportType"]) {
+    const sum = array.filter(elem => {
+      return elem === it;
+    }).length;
+    transportStats.data.push(sum);
+    transportStats.labels.push(`${_data__WEBPACK_IMPORTED_MODULE_3__["travelToData"][it].name} ${_data__WEBPACK_IMPORTED_MODULE_3__["travelToData"][it].icon}`);
+  }
+
+  ;
+  return transportStats;
+};
+
+const showChart = () => {
+  const eventsStats = Object.assign({}, getEventsStats());
+  const transportStats = Object.assign({}, getTransportStats());
+  const moneyCtx = document.querySelector(`.statistic__money`);
+  const transportCtx = document.querySelector(`.statistic__transport`);
+  const timeSpendCtx = document.querySelector(`.statistic__time-spend`);
+  const BAR_HEIGHT = 65;
+  moneyCtx.height = BAR_HEIGHT * 6;
+  transportCtx.height = BAR_HEIGHT * 4;
+  timeSpendCtx.height = BAR_HEIGHT * 4;
+  const moneyChart = new !(function webpackMissingModule() { var e = new Error("Cannot find module 'chart.js'"); e.code = 'MODULE_NOT_FOUND'; throw e; }())(moneyCtx, {
+    plugins: [!(function webpackMissingModule() { var e = new Error("Cannot find module 'chartjs-plugin-datalabels'"); e.code = 'MODULE_NOT_FOUND'; throw e; }())],
+    type: `horizontalBar`,
+    data: {
+      labels: eventsStats.labels,
+      datasets: [{
+        data: eventsStats.data,
+        backgroundColor: `#ffffff`,
+        hoverBackgroundColor: `#ffffff`,
+        anchor: `start`
+      }]
+    },
+    options: {
+      plugins: {
+        datalabels: {
+          font: {
+            size: 13
+          },
+          color: `#000000`,
+          anchor: 'end',
+          align: 'start',
+          formatter: val => `€ ${val}`
+        }
+      },
+      title: {
+        display: true,
+        text: `MONEY`,
+        fontColor: `#000000`,
+        fontSize: 23,
+        position: `left`
+      },
+      scales: {
+        yAxes: [{
+          ticks: {
+            fontColor: `#000000`,
+            padding: 5,
+            fontSize: 13
+          },
+          gridLines: {
+            display: false,
+            drawBorder: false
+          },
+          barThickness: 44
+        }],
+        xAxes: [{
+          ticks: {
+            display: false,
+            beginAtZero: true
+          },
+          gridLines: {
+            display: false,
+            drawBorder: false
+          },
+          minBarLength: 50
+        }]
+      },
+      legend: {
+        display: false
+      },
+      tooltips: {
+        enabled: false
+      }
+    }
+  });
+  const transportChart = new !(function webpackMissingModule() { var e = new Error("Cannot find module 'chart.js'"); e.code = 'MODULE_NOT_FOUND'; throw e; }())(transportCtx, {
+    plugins: [!(function webpackMissingModule() { var e = new Error("Cannot find module 'chartjs-plugin-datalabels'"); e.code = 'MODULE_NOT_FOUND'; throw e; }())],
+    type: `horizontalBar`,
+    data: {
+      labels: transportStats.labels,
+      datasets: [{
+        data: transportStats.data,
+        backgroundColor: `#ffffff`,
+        hoverBackgroundColor: `#ffffff`,
+        anchor: `start`
+      }]
+    },
+    options: {
+      plugins: {
+        datalabels: {
+          font: {
+            size: 13
+          },
+          color: `#000000`,
+          anchor: 'end',
+          align: 'start',
+          formatter: val => `${val}x`
+        }
+      },
+      title: {
+        display: true,
+        text: `TRANSPORT`,
+        fontColor: `#000000`,
+        fontSize: 23,
+        position: `left`
+      },
+      scales: {
+        yAxes: [{
+          ticks: {
+            fontColor: `#000000`,
+            padding: 5,
+            fontSize: 13
+          },
+          gridLines: {
+            display: false,
+            drawBorder: false
+          },
+          barThickness: 44
+        }],
+        xAxes: [{
+          ticks: {
+            display: false,
+            beginAtZero: true
+          },
+          gridLines: {
+            display: false,
+            drawBorder: false
+          },
+          minBarLength: 50
+        }]
+      },
+      legend: {
+        display: false
+      },
+      tooltips: {
+        enabled: false
+      }
+    }
+  });
 };
 
 /***/ }),
@@ -7866,7 +8209,7 @@ editEventComponents.onSubmit = newObject => {
 /*!**********************!*\
   !*** ./src/utils.js ***!
   \**********************/
-/*! exports provided: getRandom, clearElement, createElement */
+/*! exports provided: getRandom, clearElement, createElement, getTotalPrice */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -7874,6 +8217,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getRandom", function() { return getRandom; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "clearElement", function() { return clearElement; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "createElement", function() { return createElement; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getTotalPrice", function() { return getTotalPrice; });
+/* harmony import */ var _data__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./data */ "./src/data.js");
+
 const getRandom = (min, max) => {
   return Math.floor(Math.random() * (max - min)) + min;
 };
@@ -7886,6 +8232,16 @@ const createElement = template => {
   const newElement = document.createElement(`div`);
   newElement.innerHTML = template;
   return newElement.firstChild;
+};
+const getTotalPrice = (data, price) => {
+  let sum = 0;
+
+  for (const it of data) {
+    sum += Number(_data__WEBPACK_IMPORTED_MODULE_0__["offersData"][it].cost);
+  }
+
+  sum += Number(price);
+  return sum;
 };
 
 /***/ })
