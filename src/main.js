@@ -4,46 +4,96 @@ import {Event} from "./classes/event";
 import {EventEdit} from "./classes/event-edit";
 import {Filter} from "./classes/filter";
 
+import {showChart} from "./show-stats";
+import {setSwitcher} from "./setSwitcher";
 
 const eventsContainer = document.querySelector(`.trip-day__items`);
-const filtersContainer = document.querySelector(`.trip-filter`);
-export const moment = require(`moment`);
-
+export const filtersContainer = document.querySelector(`.trip-filter`);
 clearElement(filtersContainer);
 clearElement(eventsContainer);
 
-// const eventComponents = [];
-// const editEventComponents = [];
-const filtersComponents = [];
+export const moment = require(`moment`);
+export const initialEvents =  new Array(7).fill(7).map(pointData);
 
-for (let i = 0; i < 3; i++) {
+
+
+const filtersComponents = [];
+for (let i = 0; i < filtersData.length; i++) {
   filtersComponents[i] = new Filter(filtersData[i]);
   filtersContainer.appendChild(filtersComponents[i].render());
+
+
+  filtersComponents[i].onFilter = (evt) => {
+    const filterName = evt.target.id;
+    const filteredEvents = sortEvents(initialEvents, filterName);
+    renderTasks(filteredEvents, eventsContainer);
+  };
 }
 
-const eventComponents = new Event(pointData);
-const editEventComponents = new EventEdit(pointData);
-
-eventsContainer.appendChild(eventComponents.render());
-
-eventComponents.onEdit = () => {
-  editEventComponents.render();
-  eventsContainer.replaceChild(editEventComponents.element, eventComponents.element);
-  eventComponents.unrender();
+const updateEvent = (events, i, newEvent) => {
+  events[i] = Object.assign({}, events[i], newEvent);
+  return events[i];
 };
 
-editEventComponents.onSubmit = (newObject) => {
-  event.type = newObject.type;
-  event.price = newObject.price;
-  event.city = newObject.city;
-  event.description = newObject.description;
-  event.date = newObject.date;
-  event.isFavorite = newObject.isFavorite;
-  event.offers = newObject.offers;
-
-  eventComponents.update(event);
-  eventComponents.render();
-  eventsContainer.replaceChild(eventComponents.element, editEventComponents.element);
-  editEventComponents.unrender();
+const sortEvents = (events, filterName) => {
+  switch (filterName) {
+    case `filter-everything`:
+      return initialEvents;
+    case `filter-future`:
+      return initialEvents.filter((it) => it.day > Date.now());
+    case `filter-past`:
+      return initialEvents.filter((it) => it.day < Date.now());
+  }
+  return null;
 };
+
+const renderTasks = (events) => {
+  eventsContainer.innerHTML = ``;
+  if (events !== null && !events.deleted) {
+
+    for (let i = 0; i < events.length; i++) {
+      const event = events[i];
+      const eventComponent = new Event(event);
+      const editEventComponent = new EventEdit(event);
+
+      eventComponent.onEdit = () => {
+
+        editEventComponent.render();
+        eventsContainer.replaceChild(
+            editEventComponent.element,
+            eventComponent.element);
+        eventComponent.unrender();
+      };
+      editEventComponent.onSubmit = (newObject) => {
+        const updatedEvent = updateEvent(events, i, newObject);
+        eventComponent.update(updatedEvent);
+        eventComponent.render();
+        eventsContainer.replaceChild(
+            eventComponent.element,
+            editEventComponent.element);
+        editEventComponent.unrender();
+      };
+      editEventComponent.onDelete = () => {
+        editEventComponent.unrender();
+        events[i].deleted = true;
+        console.log(events);
+      };
+      eventsContainer.appendChild(eventComponent.render());
+    }
+
+
+    showChart();
+    setSwitcher();
+
+  }
+
+};
+
+
+
+
+renderTasks(initialEvents, eventsContainer);
+
+
+
 
