@@ -1,6 +1,6 @@
 import {Component} from "./component";
 
-export class Filter extends Component {
+export class SortFilter extends Component {
   constructor(data) {
     super();
     this._caption = data.caption;
@@ -19,20 +19,21 @@ export class Filter extends Component {
 
 
   get template() {
-    return `<span><input type="radio" id="filter-${this._caption.toLowerCase()}"
-            name="filter" value="${this._caption.toLowerCase()}"
-            ${this._checked ? ` checked` : ``}>
-            <label class="trip-filter__item filter-${this._caption.toLowerCase()}"
-            for="filter-${this._caption.toLowerCase()}">${this._caption}</label></span>`.trim();
+    return `
+    <span>
+    <input type="radio" name="trip-sorting" id="sorting-${this._caption}" value="${this._caption}" ${(this._checked) ? `checked` : ``}>
+    <label class="trip-sorting__item trip-sorting__item--${this._caption}" for="sorting-${this._caption}">${this._caption.toUpperCase()}</label>
+    </span>
+   `.trim();
   }
 
   bind() {
-    this._element.querySelector(`#filter-${this._caption.toLowerCase()}`)
+    this._element.querySelector(`input`)
       .addEventListener(`click`, this._onFilterButtonClick);
   }
 
   unbind() {
-    this._element.querySelector(`#filter-${this._caption.toLowerCase()}`)
+    this._element.querySelector(`#sorting--${this._caption.toLowerCase()}`)
       .removeEventListener(`click`, this._onFilterButtonClick);
   }
 
