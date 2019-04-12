@@ -1,10 +1,21 @@
-import {getRandom} from "./utils";
+import {getRandom} from "../utils";
+import flatpickr from 'flatpickr';
 
 export const filtersData = [
   {"caption": `Everything`, "checked": true},
   {"caption": `Future`, "checked": false},
   {"caption": `Past`, "checked": false},
 ];
+
+export const sortFiltersData = [
+  {"caption": `event`, "checked": true},
+  {"caption": `time`, "checked": false},
+  {"caption": `price`, "checked": false},
+  {"caption": `offers`, "checked": false},
+];
+
+
+
 
 export const travelType = [`taxi`, `bus`, `train`, `ship`, `transport`, `drive`, `flight`, `check-in`,
   `sightseeing`, `restaurant`];
@@ -42,16 +53,18 @@ export const cities = [`Amsterdam`, `Geneva`, `Chamonix`, `Novosibirsk`];
 
 export const pointData = () => {
   return {
+    id: 0,
     deleted: false,
     day: new Date(),
     type: travelType[getRandom(0, 9)],
     city: cities[getRandom(0, 4)],
-    photo: [`http://picsum.photos/100/100?r=${Math.random()}`, `http://picsum.photos/100/100?r=${getRandom(0, 1000)}`, `http://picsum.photos/100/100?r=${Math.random()}`],
+    photos: [`http://picsum.photos/100/100?r=${Math.random()}`, `http://picsum.photos/100/100?r=${getRandom(0, 1000)}`, `http://picsum.photos/100/100?r=${Math.random()}`],
     offers: new Set([
       `add-luggage`,
       `switch-to-comfort-class`,
     ]),
-    date: `00:00 - 00:00`,
+    dateFrom: new Date(),
+    dateTo: moment(new Date()).add(1, `days`).add(10, `minutes`).toDate(),
     totalPrice: 0,
     price: getRandom(1, 10) * 100,
     description: [`Lorem ipsum dolor sit amet, consectetur adipiscing elit.`,

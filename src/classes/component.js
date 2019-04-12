@@ -24,6 +24,11 @@ export class Component {
     return this._element;
   }
 
+  redraw() {
+    const eventElement = this._element;
+    this._element.parentNode.replaceChild(this.render(), eventElement);
+  }
+
   bind() {}
 
   unbind() {}
@@ -33,4 +38,6 @@ export class Component {
     this._element.remove();
     this._element = null;
   }
+
+  update() {}
 }
