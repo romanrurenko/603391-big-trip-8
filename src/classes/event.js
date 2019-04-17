@@ -36,7 +36,7 @@ export class Event extends Component
           </p>
           <p class="trip-point__price">&euro;&nbsp;${this._price}</p>
           <ul class="trip-point__offers">                       
-      ${(Array.from(this._offers).map((offer) => (((offer.accepted) ? `<li><button class="trip-point__offer">
+      ${(Array.from(this._offers).slice(1, 4).map((offer) => (((offer.accepted) ? `<li><button class="trip-point__offer">
  ${offer.title}+&euro;${offer.price}</button></li>` : ``).trim())).join(``))}
           </ul>
         </article>`.trim();

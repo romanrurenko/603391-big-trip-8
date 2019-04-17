@@ -17,7 +17,6 @@ export class SortFilter extends Component {
     this._onFilter = fn;
   }
 
-
   get template() {
     return `
     <span>

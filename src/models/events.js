@@ -34,6 +34,7 @@ export class ModelEvent {
   }
 
 
+
   static parseEvent(data) {
     return new ModelEvent(data);
   }

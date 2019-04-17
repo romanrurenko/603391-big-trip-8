@@ -4,13 +4,13 @@ import {travelToData, travelType} from "../data/mock-data";
 import {getElementPrice} from "../utils";
 import moment from 'moment';
 import flatpickr from 'flatpickr';
+import {offersData} from "../main";
 
 export class EventEdit extends Component {
   constructor(data) {
     super();
     this._id = data.id;
     this._type = data.type;
-
     this._city = data.city;
     this._photos = data.photos;
     this._description = data.description;
@@ -31,7 +31,6 @@ export class EventEdit extends Component {
     this._totalPrice = getElementPrice(data.offers, data.price);
     this._deleted = data.deleted;
     this._onDelete = null;
-
   }
 
   _processForm(formData) {
@@ -123,7 +122,6 @@ export class EventEdit extends Component {
     ))).join(``)}
         </div>`;
   }
-
 
   _onTravelClick(evt) {
     let newTravelType = evt.target.value;
@@ -277,7 +275,6 @@ export class EventEdit extends Component {
 
     this._element.querySelector(`.travel-way__select`)
       .addEventListener(`click`, this._onTravelClick);
-
 
     this._element.querySelector(`.event__form`)
       .addEventListener(`submit`, this._onSubmitButtonClick);

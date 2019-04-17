@@ -14,9 +14,6 @@ export const sortFiltersData = [
   {"caption": `offers`, "checked": false},
 ];
 
-
-
-
 export const travelType = [`taxi`, `bus`, `train`, `ship`, `transport`, `drive`, `flight`, `check-in`,
   `sightseeing`, `restaurant`];
 
